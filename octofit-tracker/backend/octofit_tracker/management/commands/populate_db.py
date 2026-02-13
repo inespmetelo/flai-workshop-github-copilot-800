@@ -28,98 +28,138 @@ class Command(BaseCommand):
         self.stdout.write('Populating users...')
         marvel_heroes = [
             {
-                'name': 'Tony Stark',
+                'username': 'ironman',
                 'email': 'ironman@marvel.com',
-                'password': 'hashed_password_1',
-                'team': 'Team Marvel',
-                'created_at': datetime.now()
+                'first_name': 'Tony',
+                'last_name': 'Stark',
+                'fitness_level': 'advanced',
+                'total_points': 0,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             },
             {
-                'name': 'Steve Rogers',
+                'username': 'captainamerica',
                 'email': 'captainamerica@marvel.com',
-                'password': 'hashed_password_2',
-                'team': 'Team Marvel',
-                'created_at': datetime.now()
+                'first_name': 'Steve',
+                'last_name': 'Rogers',
+                'fitness_level': 'advanced',
+                'total_points': 0,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             },
             {
-                'name': 'Natasha Romanoff',
+                'username': 'blackwidow',
                 'email': 'blackwidow@marvel.com',
-                'password': 'hashed_password_3',
-                'team': 'Team Marvel',
-                'created_at': datetime.now()
+                'first_name': 'Natasha',
+                'last_name': 'Romanoff',
+                'fitness_level': 'advanced',
+                'total_points': 0,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             },
             {
-                'name': 'Bruce Banner',
+                'username': 'hulk',
                 'email': 'hulk@marvel.com',
-                'password': 'hashed_password_4',
-                'team': 'Team Marvel',
-                'created_at': datetime.now()
+                'first_name': 'Bruce',
+                'last_name': 'Banner',
+                'fitness_level': 'intermediate',
+                'total_points': 0,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             },
             {
-                'name': 'Thor Odinson',
+                'username': 'thor',
                 'email': 'thor@marvel.com',
-                'password': 'hashed_password_5',
-                'team': 'Team Marvel',
-                'created_at': datetime.now()
+                'first_name': 'Thor',
+                'last_name': 'Odinson',
+                'fitness_level': 'advanced',
+                'total_points': 0,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             }
         ]
         
         dc_heroes = [
             {
-                'name': 'Bruce Wayne',
+                'username': 'batman',
                 'email': 'batman@dc.com',
-                'password': 'hashed_password_6',
-                'team': 'Team DC',
-                'created_at': datetime.now()
+                'first_name': 'Bruce',
+                'last_name': 'Wayne',
+                'fitness_level': 'advanced',
+                'total_points': 0,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             },
             {
-                'name': 'Clark Kent',
+                'username': 'superman',
                 'email': 'superman@dc.com',
-                'password': 'hashed_password_7',
-                'team': 'Team DC',
-                'created_at': datetime.now()
+                'first_name': 'Clark',
+                'last_name': 'Kent',
+                'fitness_level': 'advanced',
+                'total_points': 0,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             },
             {
-                'name': 'Diana Prince',
+                'username': 'wonderwoman',
                 'email': 'wonderwoman@dc.com',
-                'password': 'hashed_password_8',
-                'team': 'Team DC',
-                'created_at': datetime.now()
+                'first_name': 'Diana',
+                'last_name': 'Prince',
+                'fitness_level': 'advanced',
+                'total_points': 0,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             },
             {
-                'name': 'Barry Allen',
+                'username': 'flash',
                 'email': 'flash@dc.com',
-                'password': 'hashed_password_9',
-                'team': 'Team DC',
-                'created_at': datetime.now()
+                'first_name': 'Barry',
+                'last_name': 'Allen',
+                'fitness_level': 'intermediate',
+                'total_points': 0,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             },
             {
-                'name': 'Arthur Curry',
+                'username': 'aquaman',
                 'email': 'aquaman@dc.com',
-                'password': 'hashed_password_10',
-                'team': 'Team DC',
-                'created_at': datetime.now()
+                'first_name': 'Arthur',
+                'last_name': 'Curry',
+                'fitness_level': 'intermediate',
+                'total_points': 0,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             }
         ]
         
         all_users = marvel_heroes + dc_heroes
         users_result = db.users.insert_many(all_users)
+        user_ids = {user['email']: str(user_id) for user, user_id in zip(all_users, users_result.inserted_ids)}
         self.stdout.write(self.style.SUCCESS(f'Inserted {len(users_result.inserted_ids)} users'))
         
         # Populate teams
         self.stdout.write('Populating teams...')
+        marvel_team_members = [user_ids[user['email']] for user in marvel_heroes]
+        dc_team_members = [user_ids[user['email']] for user in dc_heroes]
+        
         teams = [
             {
                 'name': 'Team Marvel',
                 'description': 'Avengers assemble!',
-                'members': [user['email'] for user in marvel_heroes],
-                'created_at': datetime.now()
+                'captain_id': marvel_team_members[0],
+                'member_ids': marvel_team_members,
+                'total_points': 0,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             },
             {
                 'name': 'Team DC',
                 'description': 'Justice League unite!',
-                'members': [user['email'] for user in dc_heroes],
-                'created_at': datetime.now()
+                'captain_id': dc_team_members[0],
+                'member_ids': dc_team_members,
+                'total_points': 0,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             }
         ]
         teams_result = db.teams.insert_many(teams)
@@ -131,137 +171,122 @@ class Command(BaseCommand):
         activities = []
         
         for user in all_users:
+            user_id = user_ids[user['email']]
             # Create 3-7 random activities for each user
             num_activities = random.randint(3, 7)
             for i in range(num_activities):
                 activity = {
-                    'user_email': user['email'],
-                    'user_name': user['name'],
+                    'user_id': user_id,
                     'activity_type': random.choice(activity_types),
-                    'duration_minutes': random.randint(20, 120),
-                    'calories_burned': random.randint(100, 800),
-                    'distance_km': round(random.uniform(1.0, 20.0), 2),
-                    'date': datetime.now() - timedelta(days=random.randint(0, 30)),
-                    'created_at': datetime.now()
+                    'duration': random.randint(20, 120),  # minutes
+                    'distance': round(random.uniform(1.0, 20.0), 2),  # km
+                    'calories': random.randint(100, 800),
+                    'points': random.randint(10, 100),
+                    'notes': f"Great {random.choice(activity_types).lower()} session!",
+                    'created_at': datetime.now() - timedelta(days=random.randint(0, 30))
                 }
                 activities.append(activity)
         
         activities_result = db.activities.insert_many(activities)
         self.stdout.write(self.style.SUCCESS(f'Inserted {len(activities_result.inserted_ids)} activities'))
         
-        # Populate leaderboard
-        self.stdout.write('Populating leaderboard...')
-        leaderboard = []
-        
-        for user in all_users:
-            # Calculate total stats from activities
-            user_activities = [a for a in activities if a['user_email'] == user['email']]
-            total_calories = sum(a['calories_burned'] for a in user_activities)
-            total_duration = sum(a['duration_minutes'] for a in user_activities)
-            total_distance = sum(a['distance_km'] for a in user_activities)
-            
-            leaderboard.append({
-                'user_email': user['email'],
-                'user_name': user['name'],
-                'team': user['team'],
-                'total_calories': total_calories,
-                'total_duration_minutes': total_duration,
-                'total_distance_km': round(total_distance, 2),
-                'activity_count': len(user_activities),
-                'rank': 0,  # Will be calculated based on total_calories
-                'updated_at': datetime.now()
-            })
-        
-        # Sort by total_calories and assign ranks
-        leaderboard.sort(key=lambda x: x['total_calories'], reverse=True)
-        for idx, entry in enumerate(leaderboard):
-            entry['rank'] = idx + 1
-        
-        leaderboard_result = db.leaderboard.insert_many(leaderboard)
-        self.stdout.write(self.style.SUCCESS(f'Inserted {len(leaderboard_result.inserted_ids)} leaderboard entries'))
+        # Populate leaderboard - skip for now as we'll calculate it dynamically
+        self.stdout.write('Skipping static leaderboard (will be calculated dynamically)...')
         
         # Populate workouts
         self.stdout.write('Populating workouts...')
         workouts = [
             {
-                'name': 'Superhero Strength Training',
+                'title': 'Superhero Strength Training',
                 'description': 'Build strength like Thor with this intense workout',
-                'category': 'Strength',
-                'difficulty': 'Advanced',
-                'duration_minutes': 45,
+                'difficulty_level': 'advanced',
+                'target_fitness_levels': ['intermediate', 'advanced'],
                 'exercises': [
                     {'name': 'Hammer Curls', 'sets': 4, 'reps': 12},
                     {'name': 'Bench Press', 'sets': 4, 'reps': 10},
                     {'name': 'Squats', 'sets': 4, 'reps': 15},
                     {'name': 'Deadlifts', 'sets': 3, 'reps': 8}
                 ],
-                'created_at': datetime.now()
+                'estimated_duration': 45,
+                'estimated_calories': 500,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             },
             {
-                'name': 'Speed Force Cardio',
+                'title': 'Speed Force Cardio',
                 'description': 'Run like The Flash with this high-intensity cardio routine',
-                'category': 'Cardio',
-                'difficulty': 'Intermediate',
-                'duration_minutes': 30,
+                'difficulty_level': 'intermediate',
+                'target_fitness_levels': ['beginner', 'intermediate'],
                 'exercises': [
                     {'name': 'Sprint Intervals', 'sets': 5, 'duration': '2 minutes'},
                     {'name': 'Jump Rope', 'sets': 3, 'duration': '3 minutes'},
                     {'name': 'Burpees', 'sets': 3, 'reps': 20}
                 ],
-                'created_at': datetime.now()
+                'estimated_duration': 30,
+                'estimated_calories': 400,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             },
             {
-                'name': 'Widow Warrior Flexibility',
+                'title': 'Widow Warrior Flexibility',
                 'description': 'Enhance agility and flexibility like Black Widow',
-                'category': 'Flexibility',
-                'difficulty': 'Beginner',
-                'duration_minutes': 25,
+                'difficulty_level': 'beginner',
+                'target_fitness_levels': ['beginner'],
                 'exercises': [
                     {'name': 'Yoga Flow', 'sets': 1, 'duration': '10 minutes'},
                     {'name': 'Dynamic Stretching', 'sets': 2, 'duration': '5 minutes'},
                     {'name': 'Pilates Core', 'sets': 3, 'reps': 15}
                 ],
-                'created_at': datetime.now()
+                'estimated_duration': 25,
+                'estimated_calories': 150,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             },
             {
-                'name': 'Iron Man Endurance',
+                'title': 'Iron Man Endurance',
                 'description': 'Build endurance for long missions',
-                'category': 'Endurance',
-                'difficulty': 'Intermediate',
-                'duration_minutes': 60,
+                'difficulty_level': 'intermediate',
+                'target_fitness_levels': ['intermediate', 'advanced'],
                 'exercises': [
                     {'name': 'Cycling', 'sets': 1, 'duration': '30 minutes'},
                     {'name': 'Rowing Machine', 'sets': 1, 'duration': '20 minutes'},
                     {'name': 'Plank Hold', 'sets': 3, 'duration': '2 minutes'}
                 ],
-                'created_at': datetime.now()
+                'estimated_duration': 60,
+                'estimated_calories': 600,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             },
             {
-                'name': 'Bat-Combat HIIT',
+                'title': 'Bat-Combat HIIT',
                 'description': 'High-intensity training inspired by Batman',
-                'category': 'HIIT',
-                'difficulty': 'Advanced',
-                'duration_minutes': 40,
+                'difficulty_level': 'advanced',
+                'target_fitness_levels': ['advanced'],
                 'exercises': [
                     {'name': 'Shadow Boxing', 'sets': 4, 'duration': '3 minutes'},
                     {'name': 'Box Jumps', 'sets': 4, 'reps': 15},
                     {'name': 'Mountain Climbers', 'sets': 4, 'reps': 30},
                     {'name': 'Push-ups', 'sets': 4, 'reps': 20}
                 ],
-                'created_at': datetime.now()
+                'estimated_duration': 40,
+                'estimated_calories': 550,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             },
             {
-                'name': 'Aquaman Swim Power',
+                'title': 'Aquaman Swim Power',
                 'description': 'Master the waters with this swimming workout',
-                'category': 'Swimming',
-                'difficulty': 'Intermediate',
-                'duration_minutes': 45,
+                'difficulty_level': 'intermediate',
+                'target_fitness_levels': ['intermediate', 'advanced'],
                 'exercises': [
                     {'name': 'Freestyle Laps', 'sets': 10, 'duration': '2 minutes'},
                     {'name': 'Backstroke', 'sets': 5, 'duration': '3 minutes'},
                     {'name': 'Treading Water', 'sets': 3, 'duration': '5 minutes'}
                 ],
-                'created_at': datetime.now()
+                'estimated_duration': 45,
+                'estimated_calories': 500,
+                'created_at': datetime.now(),
+                'updated_at': datetime.now()
             }
         ]
         
@@ -273,7 +298,6 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f'Users: {len(all_users)}'))
         self.stdout.write(self.style.SUCCESS(f'Teams: {len(teams)}'))
         self.stdout.write(self.style.SUCCESS(f'Activities: {len(activities)}'))
-        self.stdout.write(self.style.SUCCESS(f'Leaderboard Entries: {len(leaderboard)}'))
         self.stdout.write(self.style.SUCCESS(f'Workouts: {len(workouts)}'))
         
         client.close()

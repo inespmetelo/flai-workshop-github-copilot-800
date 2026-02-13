@@ -108,6 +108,40 @@ class LeaderboardViewSet(viewsets.ModelViewSet):
     queryset = Leaderboard.objects.all()
     serializer_class = LeaderboardSerializer
     
+    def list(self, request, *args, **kwargs):
+        """
+        Return user rankings in a format suitable for the frontend.
+        For now, aggregate all user activities to create a leaderboard.
+        """
+        from django.db.models import Sum, Count
+        
+        # Aggregate activities by user to create leaderboard
+        # This is a temporary solution until proper leaderboard data is populated
+        leaderboard_data = []
+        
+        # Get all users with their activities
+        users = User.objects.all()
+        for user in users:
+            user_id = str(user._id)
+            activities = Activity.objects.filter(user_id=user_id)
+            
+            total_activities = activities.count()
+            total_points = sum(a.points for a in activities if a.points) or 0
+            
+            if total_activities > 0 or total_points > 0:
+                leaderboard_data.append({
+                    'id': user_id,
+                    'user': str(user._id),
+                    'user_name': user.username or user.email or 'Unknown User',
+                    'total_points': total_points,
+                    'total_activities': total_activities
+                })
+        
+        # Sort by total_points descending
+        leaderboard_data.sort(key=lambda x: x['total_points'], reverse=True)
+        
+        return Response(leaderboard_data)
+    
     def get_queryset(self):
         """
         Optionally filter leaderboard by period
